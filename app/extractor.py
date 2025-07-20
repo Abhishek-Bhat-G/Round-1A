@@ -32,7 +32,8 @@ def extract_outline(pdf_path):
     }
 
     for page_num, page in enumerate(doc, start=1):
-        for block in page.get_text("dict")["blocks"]:
+        blocks = page.get_text("dict")["blocks"]
+        for block in blocks:
             for line in block.get("lines", []):
                 line_text = ""
                 line_size = 0
@@ -41,9 +42,11 @@ def extract_outline(pdf_path):
                     if not text:
                         continue
                     line_text += " " + text if line_text else text
-                    line_size = max(line_size, span["size"])
+                    line_size = max(line_size, span["size"])  # pick largest size
+
                 if len(line_text) < 3:
                     continue
+
                 heading_level = is_heading(line_text, line_size, heading_sizes)
                 if heading_level:
                     if not title:
