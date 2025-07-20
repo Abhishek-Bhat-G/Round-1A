@@ -1,4 +1,4 @@
-import pymupdf as fitz # PyMuPDF
+import pymupdf as fitz  # newer import for PyMuPDF
 import os
 import json
 from tqdm import tqdm
@@ -34,19 +34,25 @@ def extract_outline(pdf_path):
     for page_num, page in enumerate(doc, start=1):
         for block in page.get_text("dict")["blocks"]:
             for line in block.get("lines", []):
+                line_text = ""
+                line_size = 0
                 for span in line.get("spans", []):
                     text = span["text"].strip()
-                    if not text or len(text) < 3:
+                    if not text:
                         continue
-                    heading_level = is_heading(text, span["size"], heading_sizes)
-                    if heading_level:
-                        if not title:
-                            title = text
-                        outline.append({
-                            "level": heading_level,
-                            "text": text,
-                            "page": page_num
-                        })
+                    line_text += " " + text if line_text else text
+                    line_size = max(line_size, span["size"])
+                if len(line_text) < 3:
+                    continue
+                heading_level = is_heading(line_text, line_size, heading_sizes)
+                if heading_level:
+                    if not title:
+                        title = line_text
+                    outline.append({
+                        "level": heading_level,
+                        "text": line_text,
+                        "page": page_num
+                    })
 
     return {
         "title": title,
@@ -65,6 +71,12 @@ def process_all_pdfs(input_dir, output_dir):
             json.dump(result, f, indent=2)
 
 if __name__ == "__main__":
-    input_dir = "input"
-    output_dir = "output"
+    if os.path.exists("/app/input"):
+    # Running inside Docker
+        input_dir = "/app/input"
+        output_dir = "/app/output"
+    else:
+    # Running locally
+        input_dir = "app/input"
+        output_dir = "app/output"
     process_all_pdfs(input_dir, output_dir)
