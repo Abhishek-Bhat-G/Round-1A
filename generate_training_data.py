@@ -55,7 +55,7 @@ def generator():
 
     df = pd.DataFrame(rows)
     df.to_csv("training_data.csv", index=False)
-    print("✅ training_data.csv generated!")
+    print("training_data.csv generated!")
 
 if __name__ == "__main__":
     generator()

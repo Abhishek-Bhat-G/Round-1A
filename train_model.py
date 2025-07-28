@@ -17,4 +17,4 @@ model.fit(X, y_encoded)
 joblib.dump(model, "app/model.pkl")
 joblib.dump(le, "app/label_encoder.pkl")
 
-print("✅ Model & label encoder saved.")
+print("Model & label encoder saved.")
